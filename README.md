@@ -74,8 +74,10 @@
 ### Instruction:
 - In portal.azure.com, we create 2 web app services, one for the frontend, and one for the backend
 - Here is the backend configuration:
+  
 ![Backend config](Img/deploy/1.png)
 - Here is the frontend configuration:
+  
 ![Frontend config](Img/deploy/2.png)
 - After the services are created, we should get two web app URLs for each. Copy the frontend URL, open application.properties located in src/main/resources, set the app.cors.allowed-origin as the Azure Web Service frontend URL.
 ![Allow CORS for frontend](Img/deploy/3.png)
