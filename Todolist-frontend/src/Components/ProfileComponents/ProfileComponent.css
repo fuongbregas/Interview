@@ -1,0 +1,57 @@
+.profile-root {
+	padding: 0 16px;
+}
+
+.profile-card {
+	max-width: 520px;
+	margin: 12px auto;
+	padding: 20px;
+	border: 1px solid var(--border);
+	border-radius: 12px;
+	background: var(--card);
+}
+
+.profile-title {
+	margin: 0 0 14px;
+}
+
+.profile-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 12px;
+}
+
+.profile-field label {
+	color: var(--muted);
+}
+
+.profile-input {
+	border: 1px solid var(--border);
+	background: transparent;
+	color: var(--text);
+	padding: 8px 10px;
+	border-radius: 8px;
+}
+
+.profile-input:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 1px;
+}
+
+.profile-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 14px;
+}
+
+.profile-error {
+	margin: 12px 0 0;
+	color: salmon;
+}
+
+.profile-success {
+	margin: 12px 0 0;
+	color: var(--accent);
+}

@@ -1,0 +1,28 @@
+.dash-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dash-pageInfo {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.dash-pagination-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.dash-pagination-btn:disabled {
+  background: var(--border);
+  color: var(--muted);
+  border-color: var(--border);
+  opacity: 0.9;
+  cursor: not-allowed;
+}

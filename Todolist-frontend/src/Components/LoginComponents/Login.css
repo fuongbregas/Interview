@@ -1,0 +1,17 @@
+.lc-root{ background:var(--bg); color:var(--text); min-height:100vh; padding:20px; }
+.lc-card{ max-width:400px; margin:12px auto; padding:20px; border:1px solid var(--border); border-radius:6px; background:var(--card); box-shadow:0 1px 3px rgba(2,6,23,0.04); }
+.lc-title{ margin:0 0 12px 0; }
+.lc-field{ margin-bottom:12px; }
+.lc-field label{ display:block; font-size:14px; margin-bottom:6px; color:var(--muted); }
+.lc-input{ width:95%; padding:8px; border:1px solid var(--border); border-radius:4px; background:transparent; color:var(--text); }
+.lc-actions{ display:flex; gap:8px; }
+.btn{ flex:1; padding:8px; border-radius:4px; border:1px solid transparent; cursor:pointer; background:transparent; color:var(--text); }
+.btn.primary{ background:var(--accent); color:var(--btn-text); }
+.btn.secondary{ background:transparent; border:1px solid var(--border); }
+.btn:disabled{
+	background: var(--border);
+	color: var(--muted);
+	border-color: var(--border);
+	cursor: not-allowed;
+}
+.register-body{ padding:0; }

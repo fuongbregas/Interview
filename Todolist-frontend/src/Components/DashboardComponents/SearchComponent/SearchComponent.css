@@ -1,0 +1,18 @@
+.dash-search-wrap {
+  margin-bottom: 12px;
+}
+
+.dash-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.dash-search-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

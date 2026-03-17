@@ -1,0 +1,59 @@
+.dash-delete-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dash-delete-popup {
+  width: 100%;
+  max-width: 360px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 16px;
+}
+
+.dash-delete-popup-text {
+  margin: 0 0 14px;
+  color: var(--text);
+}
+
+.dash-delete-popup-error {
+  margin: 0 0 10px;
+  color: #ef4444;
+  font-size: 14px;
+}
+
+.dash-delete-popup-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dash-delete-confirm-btn,
+.dash-delete-cancel-btn {
+  border: 1px solid transparent;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dash-delete-confirm-btn {
+  background: #ef4444;
+}
+
+.dash-delete-cancel-btn {
+  background: var(--muted);
+}
+
+.dash-delete-confirm-btn:disabled,
+.dash-delete-cancel-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

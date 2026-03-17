@@ -1,0 +1,61 @@
+.todo-card{
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.todo-card:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.todo-header{
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.todo-handle{
+  user-select: none;
+  cursor: grab;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  line-height: 1;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.todo-handle:active{
+  cursor: grabbing;
+}
+
+.todo-dragging{
+  opacity: 0.7;
+}
+
+.todo-title{
+  font-weight: 600;
+  flex: 1;
+}
+
+.todo-date{
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.todo-desc{
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.todo-meta{
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 12px;
+}
