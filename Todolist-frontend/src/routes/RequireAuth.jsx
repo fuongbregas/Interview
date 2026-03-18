@@ -6,15 +6,7 @@ const RequireAuth = ({ children }) => {
     const auth = useSelector((state) => state.auth.auth);
     const location = useLocation();
 
-    const hasSessionAuth = (() => {
-        try {
-            return Boolean(sessionStorage.getItem('auth'));
-        } catch {
-            return false;
-        }
-    })();
-
-    if (!auth || !hasSessionAuth) {
+    if (!auth) {
         return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
