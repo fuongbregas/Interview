@@ -71,6 +71,10 @@ const authSlice = createSlice({
       state.error = null;
       clearAuthFromSessionStorage();
     },
+    clearAuthError(state) {
+      state.error = null;
+      if (state.status === 'failed') state.status = 'idle';
+    },
     setAuth(state, action) {
       state.auth = action.payload;
       clearAuthFromSessionStorage();
@@ -94,7 +98,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setAuth } = authSlice.actions;
+export const { logout, clearAuthError, setAuth } = authSlice.actions;
 export default authSlice.reducer;
 
 export const selectAuth = (state) => state.auth.auth;

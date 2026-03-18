@@ -54,7 +54,7 @@ const Register = ({ onClose }) => {
           </button>
           <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
         </div>
-        {error ? <p style={{ marginTop: 12, color: 'salmon' }}>{error}</p> : null}
+        {error ? <p className='error-message'>{error}</p> : null}
       </form>
     </div>
   );

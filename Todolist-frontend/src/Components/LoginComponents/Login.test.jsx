@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import Login from './Login';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../store/authSlice';
+import { clearAuthError, login } from '../../store/authSlice';
 
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn(),
@@ -31,8 +31,10 @@ jest.mock('./Register', () => {
 jest.mock('../../store/authSlice', () => {
   const mockLogin = jest.fn();
   mockLogin.fulfilled = { match: jest.fn() };
+  const mockClearAuthError = jest.fn(() => ({ type: 'auth/clearAuthError' }));
   return {
     login: mockLogin,
+    clearAuthError: mockClearAuthError,
   };
 });
 
@@ -45,6 +47,7 @@ describe('Login', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    clearAuthError.mockReturnValue({ type: 'auth/clearAuthError' });
     useNavigate.mockReturnValue(mockNavigate);
     useDispatch.mockReturnValue(mockDispatch);
     useSelector.mockImplementation((selector) => selector({ auth: { status: 'idle', error: null } }));
@@ -141,6 +144,8 @@ describe('Login', () => {
     renderLogin();
 
     fireEvent.click(screen.getByRole('button', { name: /register/i }));
+    expect(clearAuthError).toHaveBeenCalledTimes(1);
+    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'auth/clearAuthError' }));
     expect(screen.getByText(/mock register form/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /close register/i }));

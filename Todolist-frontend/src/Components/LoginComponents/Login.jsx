@@ -31,6 +31,11 @@ const Login = () => {
     }
   }
 
+  const handleRegister = () => {
+    dispatch(clearAuthError());
+    setShowRegister(true);
+  };
+
   return (
     <div className="lc-root">
       {!showRegister ? (
@@ -49,9 +54,9 @@ const Login = () => {
               <button type="submit" className="btn primary" disabled={isLoginDisabled}>
                 {status === 'loading' ? 'Logging in…' : 'Login'}
               </button>
-              <button type="button" className="btn secondary" onClick={() => setShowRegister(true)}>Register</button>
+              <button type="button" className="btn secondary" onClick={handleRegister}>Register</button>
             </div>
-            {error ? <p style={{ marginTop: 12, color: 'salmon' }}>{error}</p> : null}
+            {error ? <p className='error-message'>{error}</p> : null}
           </form>
         </div>
       ) : (
