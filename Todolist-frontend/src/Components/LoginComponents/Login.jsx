@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Register from './Register';
 import './Login.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../store/authSlice';
+import { clearAuthError, login } from '../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {

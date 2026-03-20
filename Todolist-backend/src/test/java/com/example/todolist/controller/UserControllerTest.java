@@ -58,7 +58,7 @@ class UserControllerTest {
         ResponseEntity<?> response = userController.register(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(created, response.getBody());
+        assertEquals("User created", response.getBody());
     }
 
     @Test

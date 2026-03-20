@@ -8,7 +8,6 @@ import AddComponent from '../AddComponent/AddComponent';
 import SearchComponent from '../SearchComponent/SearchComponent';
 import { arrayMove } from '../../../utils/arrayMove';
 import {
-    applyDisplayTaskOrder,
     extractTodoList,
     toBackendTodolistEntityList,
     toDisplayOrder,
@@ -118,7 +117,7 @@ const DashboardComponent = () => {
             if (beforeOrder === afterOrder) return;
         }
 
-        const reorderedTodos = applyDisplayTaskOrder(todos);
+        const reorderedTodos = toBackendTodolistEntityList(todos);
         setTodos(reorderedTodos);
         commitMove(reorderedTodos, beforeDragTodos);
     };
