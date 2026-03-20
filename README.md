@@ -65,6 +65,7 @@
 
 ### Test coverage for the frontend
 - To run the frontend tests with coverage, run the command: npx react-scripts test --coverage --watchAll=false. The output can be accessed in /coverage/lcov-report/index.html
+
 ![Frontend coverage](Img/fe/1.png)
 
 # Web Application Deployment to Azure Portal Instruction
@@ -76,20 +77,29 @@
 - Here is the backend configuration:
   
 ![Backend config](Img/deploy/1.png)
+
 - Here is the frontend configuration:
   
 ![Frontend config](Img/deploy/2.png)
+
 - After the services are created, we should get two web app URLs for each. Copy the frontend URL, open application.properties located in src/main/resources, set the app.cors.allowed-origin as the Azure Web Service frontend URL.
+
 ![Allow CORS for frontend](Img/deploy/3.png)
+
 - For the frontend, in the root directory of the app, create an .env.production file, and set the REACT_APP_API_BASE_URL as the URL of the Azure Web Service backend.
+
 ![Backend URL](Img/deploy/5.png).
+
 - In Azure Portal, navigate to Settings/Configuration/StackSettings to add run config. For backend, use the command: java -jar /home/site/wwwroot/app.jar. For frontend, use the command: pm2 serve /home/site/wwwroot/build --no-daemon --spa --port 8080
 - We can build the backend by using the command: mvn clean package -DskipTests. For the frontend, use the command: npm run build.
 - Install and open Visual Studio Code, install the Azure extension from the Marketplace, and login to Microsoft account. Azure extension displays all the available web services. Locate our newly created frontend and backend web services.
 - For backend, right click the backend service, select Deploy to Web App... The extension will ask to select the built .jar file, the file is located in: /target/todolist-0.0.1-SNAPSHOT.jar. Azure extension also asks to enter port number, we are using 8082.
+
 ![Enter backend port number](Img/deploy/4.png)
+
 - For frontend, right click the frontend service, select Deploy to Web App... The extension will ask to select the build folder, which is located in the root folder of the frontend project.
 - If successfully deployed, the application can be accessed in the browser:
+
 ![Live webapp](Img/deploy/6.png)
 
 - Deployed backend URL, can be tested with Postman and Insomnia: https://todolist-java-dycsc5bdfecfdwe4.centralus-01.azurewebsites.net/
