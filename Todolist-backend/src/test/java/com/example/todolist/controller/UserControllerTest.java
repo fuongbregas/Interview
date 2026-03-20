@@ -101,7 +101,7 @@ class UserControllerTest {
         ResponseEntity<?> response = userController.update(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updated, response.getBody());
+        assertEquals("User updated", response.getBody());
     }
 
     @Test

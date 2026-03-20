@@ -50,8 +50,8 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<?> update(@RequestBody UpdateUserRequest request) {
         try {
-            UserEntity created = userService.updateUser(request.getUserId(), request.getUserName(), request.getPassword());
-            return ResponseEntity.ok(created);
+            userService.updateUser(request.getUserId(), request.getUserName(), request.getPassword());
+            return ResponseEntity.ok("User updated");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
