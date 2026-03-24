@@ -5,6 +5,7 @@ import com.example.todolist.controller.dto.UserDto.LoginResponse;
 import com.example.todolist.controller.dto.UserDto.RegisterRequest;
 import com.example.todolist.controller.dto.UserDto.UpdateUserRequest;
 import com.example.todolist.entity.UserEntity;
+import com.example.todolist.security.TokenService;
 import com.example.todolist.service.User.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -25,6 +27,8 @@ class UserControllerTest {
 
     @Mock
     private UserService userService;
+    @Mock
+    private TokenService tokenService;
 
     @InjectMocks
     private UserController userController;
@@ -58,7 +62,7 @@ class UserControllerTest {
         ResponseEntity<?> response = userController.register(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User created", response.getBody());
+        assertEquals("Created", response.getBody());
     }
 
     @Test
@@ -78,9 +82,9 @@ class UserControllerTest {
 
     @Test
     void getUsernameOk() {
-        when(userService.getUsernameFromUserId(1L)).thenReturn("alice");
+        when(userService.getUsernameFromToken("token")).thenReturn("alice");
 
-        String result = userController.getUsername(1L);
+        String result = userController.getUsername("token");
 
         assertEquals("alice", result);
     }
@@ -88,7 +92,7 @@ class UserControllerTest {
     @Test
     void updateOk() {
         UpdateUserRequest request = new UpdateUserRequest();
-        request.setUserId(1L);
+        request.setToken("token");
         request.setUserName("alice");
         request.setPassword("new-secret");
 
@@ -96,7 +100,7 @@ class UserControllerTest {
         updated.setId(1L);
         updated.setUserName("alice");
 
-        when(userService.updateUser(1L, "alice", "new-secret")).thenReturn(updated);
+        when(userService.updateUser("token", "alice", "new-secret")).thenReturn(updated);
 
         ResponseEntity<?> response = userController.update(request);
 
@@ -107,11 +111,11 @@ class UserControllerTest {
     @Test
     void updateErrorWhenException() {
         UpdateUserRequest request = new UpdateUserRequest();
-        request.setUserId(1L);
+        request.setToken("token");
         request.setUserName("alice");
         request.setPassword("new-secret");
 
-        when(userService.updateUser(1L, "alice", "new-secret"))
+        when(userService.updateUser("token", "alice", "new-secret"))
                 .thenThrow(new RuntimeException("Failed to update profile"));
 
         ResponseEntity<?> response = userController.update(request);
@@ -127,7 +131,7 @@ class UserControllerTest {
         request.setPassword("secret");
 
         com.example.todolist.service.User.LoginResponse serviceResponse =
-                new com.example.todolist.service.User.LoginResponse(1L, "token-123");
+                new com.example.todolist.service.User.LoginResponse("token-123");
         when(userService.loginUser("alice", "secret")).thenReturn(serviceResponse);
 
         ResponseEntity<?> response = userController.login(request);
@@ -135,7 +139,6 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertInstanceOf(LoginResponse.class, response.getBody());
         LoginResponse body = (LoginResponse) response.getBody();
-        assertEquals(1L, body.getUserId());
         assertEquals("token-123", body.getToken());
     }
 

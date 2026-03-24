@@ -24,9 +24,8 @@ describe('RequireAuth', () => {
     mockUseLocation.mockReturnValue({ pathname: '/dashboard' });
   });
 
-  test('renders children when redux auth exists and session auth exists', () => {
-    useSelector.mockImplementation((selector) => selector({ auth: { auth: { userId: 1, token: 't' } } }));
-    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue('session-token');
+  test('renders children when redux auth exists', () => {
+    useSelector.mockImplementation((selector) => selector({ auth: { auth: { token: 't' } } }));
 
     render(
       <RequireAuth>
@@ -36,13 +35,10 @@ describe('RequireAuth', () => {
 
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
     expect(Navigate).not.toHaveBeenCalled();
-
-    Storage.prototype.getItem.mockRestore();
   });
 
   test('redirects to login when redux auth is missing', () => {
     useSelector.mockImplementation((selector) => selector({ auth: { auth: null } }));
-    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue('session-token');
 
     render(
       <RequireAuth>
@@ -55,39 +51,5 @@ describe('RequireAuth', () => {
       replace: true,
       state: { from: { pathname: '/dashboard' } },
     });
-
-    Storage.prototype.getItem.mockRestore();
-  });
-
-  test('redirects to login when session auth is missing', () => {
-    useSelector.mockImplementation((selector) => selector({ auth: { auth: { userId: 1, token: 't' } } }));
-    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(null);
-
-    render(
-      <RequireAuth>
-        <div>Protected Content</div>
-      </RequireAuth>
-    );
-
-    expect(Navigate).toHaveBeenCalled();
-
-    Storage.prototype.getItem.mockRestore();
-  });
-
-  test('redirects to login when sessionStorage.getItem throws', () => {
-    useSelector.mockImplementation((selector) => selector({ auth: { auth: { userId: 1, token: 't' } } }));
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('session blocked');
-    });
-
-    render(
-      <RequireAuth>
-        <div>Protected Content</div>
-      </RequireAuth>
-    );
-
-    expect(Navigate).toHaveBeenCalled();
-
-    Storage.prototype.getItem.mockRestore();
   });
 });

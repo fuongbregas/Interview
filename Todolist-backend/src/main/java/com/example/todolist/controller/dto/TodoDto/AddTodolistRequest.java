@@ -15,6 +15,6 @@ public class AddTodolistRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
 
-    private Long ownerId;
+    private String token;
     private Long taskOrder;
 }

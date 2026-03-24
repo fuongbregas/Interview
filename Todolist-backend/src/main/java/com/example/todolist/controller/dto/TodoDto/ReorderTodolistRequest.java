@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 public class ReorderTodolistRequest {
-    Long ownerId;
+    String token;
     List<TodolistEntity> todolistEntityList;
 }

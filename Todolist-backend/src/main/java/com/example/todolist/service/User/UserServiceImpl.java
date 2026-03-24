@@ -23,11 +23,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserEntity updateUser(Long userId, String userName, String password) {
+    public UserEntity updateUser(String token, String userName, String password) {
         if (userName == null || userName.isBlank() || password == null || password.isBlank()) {
             throw new IllegalArgumentException("Username and password must be provided");
         }
-
+        Long userId = tokenService.validate(token).orElse(null);
         UserEntity updatedUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Failed to update profile"));
         updatedUser.setUserName(userName);
@@ -69,11 +69,12 @@ public class UserServiceImpl implements UserService{
         }
 
         String token = tokenService.createTokenFor(entity.getId());
-        return new LoginResponse(entity.getId(), token);
+        return new LoginResponse(token);
     }
 
     @Override
-    public String getUsernameFromUserId(Long userId) {
+    public String getUsernameFromToken(String token) {
+        Long userId = tokenService.validate(token).orElse(null);
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return user.getUserName();

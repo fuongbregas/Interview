@@ -8,7 +8,7 @@ import './ProfileComponent.css';
 const ProfileComponent = () => {
 	const navigate = useNavigate();
 	const auth = useSelector(selectAuth);
-	const ownerId = auth?.userId;
+	const token = auth?.token;
 	const [form, setForm] = useState({
 		userName: '',
 		password: '',
@@ -21,7 +21,7 @@ const ProfileComponent = () => {
 	useEffect(() => {
 		let cancelled = false;
 
-		if (!ownerId) {
+		if (!token) {
 			setForm((prev) => ({ ...prev, userName: '' }));
 			return () => {
 				cancelled = true;
@@ -31,7 +31,8 @@ const ProfileComponent = () => {
 		const getUserName = async () => {
 			try {
 				const res = await apiClient.get('/user/getUserName', {
-					params: { userId: ownerId },
+					params: { token: token },
+					headers: { Authorization: `Bearer ${token}` },
 				});
 
 				if (cancelled) return;
@@ -46,7 +47,7 @@ const ProfileComponent = () => {
 		return () => {
 			cancelled = true;
 		};
-	}, [ownerId]);
+	}, [token]);
 
 	useEffect(() => {
 		if (!success) return undefined;
@@ -84,7 +85,7 @@ const ProfileComponent = () => {
 			setSuccess('');
 
 			const res = await apiClient.put('/user/update', {
-				userId: Number(ownerId),
+				token: token,
 				userName: form.userName.trim(),
 				password: form.password,
 			});

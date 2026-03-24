@@ -2,6 +2,7 @@ package com.example.todolist.service.Todolist;
 
 import com.example.todolist.entity.TodolistEntity;
 import com.example.todolist.repository.TodolistRepository;
+import com.example.todolist.security.TokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,6 +26,8 @@ class TodolistServiceImplTest {
 
     @Mock
     private TodolistRepository todolistRepository;
+    @Mock
+    private TokenService tokenService;
 
     @InjectMocks
     private TodolistServiceImpl todolistService;
@@ -36,9 +40,10 @@ class TodolistServiceImplTest {
         todo.setOwnerId(ownerId);
         todo.setTaskName("Task A");
 
+        when(tokenService.validate("token")).thenReturn(Optional.of(1L));
         when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId)).thenReturn(List.of(todo));
 
-        List<TodolistEntity> result = todolistService.getTodoList(ownerId);
+        List<TodolistEntity> result = todolistService.getTodoList("token");
 
         assertEquals(1, result.size());
         assertEquals(10L, result.get(0).getId());
@@ -48,11 +53,12 @@ class TodolistServiceImplTest {
     @Test
     void testGetTodoListWhenRepositoryFails() {
         Long ownerId = 1L;
+        when(tokenService.validate("token")).thenReturn(Optional.of(ownerId));
         when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId))
                 .thenThrow(new RuntimeException("db error"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> todolistService.getTodoList(ownerId));
+                () -> todolistService.getTodoList("token"));
 
         assertEquals("db error", ex.getMessage());
     }
@@ -71,6 +77,7 @@ class TodolistServiceImplTest {
         saved.setTaskDesc("Finish test");
         saved.setTaskDate(dueDate);
 
+        when(tokenService.validate("token")).thenReturn(Optional.of(ownerId));
         when(todolistRepository.save(any(TodolistEntity.class))).thenReturn(saved);
         when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId)).thenReturn(List.of(saved));
 
@@ -78,7 +85,7 @@ class TodolistServiceImplTest {
                 "Interview preparation",
                 "Finish test",
                 dueDate,
-                ownerId,
+                "token",
                 taskOrder
         );
 
@@ -101,7 +108,7 @@ class TodolistServiceImplTest {
         when(todolistRepository.save(any(TodolistEntity.class))).thenThrow(new RuntimeException("insert failed"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> todolistService.addTodo("Task", "Desc", LocalDate.of(2026, 3, 20), 1L, 100L));
+                () -> todolistService.addTodo("Task", "Desc", LocalDate.of(2026, 3, 20), "token", 100L));
 
         assertEquals("insert failed", ex.getMessage());
     }
@@ -120,7 +127,7 @@ class TodolistServiceImplTest {
         updated.setTaskName("Updated task");
         updated.setTaskDesc("Updated desc");
         updated.setTaskDate(dueDate);
-
+        when(tokenService.validate("token")).thenReturn(Optional.of(ownerId));
         when(todolistRepository.save(any(TodolistEntity.class))).thenReturn(updated);
         when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId)).thenReturn(List.of(updated));
 
@@ -129,7 +136,7 @@ class TodolistServiceImplTest {
                 "Updated task",
                 "Updated desc",
                 dueDate,
-                ownerId,
+                "token",
                 taskOrder
         );
 
@@ -153,26 +160,26 @@ class TodolistServiceImplTest {
         when(todolistRepository.save(any(TodolistEntity.class))).thenThrow(new RuntimeException("update failed"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> todolistService.updateTodo(2L, "Updated", "Updated desc", LocalDate.of(2026, 3, 21), 1L, 200L));
+                () -> todolistService.updateTodo(2L, "Updated", "Updated desc", LocalDate.of(2026, 3, 21), "token", 200L));
 
         assertEquals("update failed", ex.getMessage());
     }
 
     @Test
     void testDeleteTodo() {
-        Long ownerId = 1L;
+        String token = "token";
         Long todoId = 3L;
 
         TodolistEntity remaining = new TodolistEntity();
         remaining.setId(9L);
-        remaining.setOwnerId(ownerId);
+        remaining.setOwnerId(1L);
+        when(tokenService.validate("token")).thenReturn(Optional.of(1L));
+        when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(1L)).thenReturn(List.of(remaining));
 
-        when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId)).thenReturn(List.of(remaining));
-
-        List<TodolistEntity> result = todolistService.deleteTodo(todoId, ownerId);
+        List<TodolistEntity> result = todolistService.deleteTodo(todoId, "token");
 
         verify(todolistRepository).deleteById(todoId);
-        verify(todolistRepository).findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
+        verify(todolistRepository).findAllByOwnerIdOrderByTaskOrderDesc(1L);
         assertEquals(1, result.size());
         assertEquals(9L, result.get(0).getId());
     }
@@ -182,7 +189,7 @@ class TodolistServiceImplTest {
         doThrow(new RuntimeException("delete failed")).when(todolistRepository).deleteById(3L);
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> todolistService.deleteTodo(3L, 1L));
+                () -> todolistService.deleteTodo(3L, "token"));
 
         assertEquals("delete failed", ex.getMessage());
     }
@@ -204,8 +211,9 @@ class TodolistServiceImplTest {
         List<TodolistEntity> payload = List.of(todo1, todo2);
         when(todolistRepository.saveAll(payload)).thenReturn(payload);
         when(todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId)).thenReturn(payload);
+        when(tokenService.validate("token")).thenReturn(Optional.of(ownerId));
 
-        List<TodolistEntity> result = todolistService.moveTodolist(ownerId, payload);
+        List<TodolistEntity> result = todolistService.moveTodolist("token", payload);
 
         verify(todolistRepository).saveAll(payload);
         verify(todolistRepository).findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
@@ -222,11 +230,11 @@ class TodolistServiceImplTest {
         todo.setId(1L);
         todo.setOwnerId(ownerId);
         List<TodolistEntity> payload = List.of(todo);
-
+        when(tokenService.validate("token")).thenReturn(Optional.of(ownerId));
         when(todolistRepository.saveAll(payload)).thenThrow(new RuntimeException("reorder failed"));
 
         RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> todolistService.moveTodolist(ownerId, payload));
+                () -> todolistService.moveTodolist("token", payload));
 
         assertEquals("reorder failed", ex.getMessage());
     }

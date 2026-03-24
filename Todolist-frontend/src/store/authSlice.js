@@ -28,14 +28,13 @@ function normalizeAuth(payload) {
   if (!payload) return null;
 
   const parsed = typeof payload === 'string' ? JSON.parse(payload) : payload;
-  const userId = parsed?.userId;
   const token = parsed?.token;
 
-  if (!userId || !token) {
-    throw new Error('Login response must contain { userId, token }.');
+  if (!token) {
+    throw new Error('Login response must contain token');
   }
 
-  return { userId, token };
+  return { token };
 }
 
 function clearAuthFromSessionStorage() {

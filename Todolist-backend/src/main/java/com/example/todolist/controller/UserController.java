@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             userService.registerUser(request.getUserName(), request.getPassword());
-            return ResponseEntity.ok("User created");
+            return ResponseEntity.ok("Created");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
@@ -41,8 +41,8 @@ public class UserController {
     @CrossOrigin
     @GetMapping("/getUserName")
     @ResponseBody
-    public String getUsername(@RequestParam Long userId) {
-        return userService.getUsernameFromUserId(userId);
+    public String getUsername(@RequestParam String token) {
+        return userService.getUsernameFromToken(token);
     }
 
 
@@ -50,7 +50,7 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<?> update(@RequestBody UpdateUserRequest request) {
         try {
-            userService.updateUser(request.getUserId(), request.getUserName(), request.getPassword());
+            userService.updateUser(request.getToken(), request.getUserName(), request.getPassword());
             return ResponseEntity.ok("User updated");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -62,7 +62,7 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             var result = userService.loginUser(request.getUserName(), request.getPassword());
-            return ResponseEntity.ok(new LoginResponse(result.getUserId(), result.getToken()));
+            return ResponseEntity.ok(new LoginResponse(result.getToken()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

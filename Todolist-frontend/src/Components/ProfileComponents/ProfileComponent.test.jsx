@@ -36,7 +36,7 @@ describe('ProfileComponent', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useNavigate.mockReturnValue(mockNavigate);
-    useSelector.mockReturnValue({ userId: 7, token: 't' });
+    useSelector.mockReturnValue({ token: 't' });
   });
 
   test('Pre-fills username', async () => {
@@ -46,15 +46,16 @@ describe('ProfileComponent', () => {
 
     await waitFor(() => {
       expect(apiClient.get).toHaveBeenCalledWith('/user/getUserName', {
-        params: { userId: 7 },
+        params: { token: 't' },
+        headers: { Authorization: 'Bearer t' },
       });
     });
 
     expect(await screen.findByDisplayValue('alice')).toBeInTheDocument();
   });
 
-  test('Fails to load username if userId is missing', () => {
-    useSelector.mockReturnValue({ token: 't' });
+  test('Fails to load username if token is missing', () => {
+    useSelector.mockReturnValue({});
 
     renderProfile();
 
@@ -92,7 +93,7 @@ describe('ProfileComponent', () => {
 
     await waitFor(() => {
       expect(apiClient.put).toHaveBeenCalledWith('/user/update', {
-        userId: 7,
+        token: 't',
         userName: 'alice-updated',
         password: 'secret123',
       });

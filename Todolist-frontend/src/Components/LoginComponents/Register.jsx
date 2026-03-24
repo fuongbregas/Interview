@@ -42,11 +42,11 @@ const Register = ({ onClose }) => {
       <form onSubmit={handleRegister}>
         <div className="lc-field">
           <label htmlFor="register-username">Username</label>
-          <input id="register-username" name="userName" className="lc-input" value={form.userName} onChange={handleChange} />
+          <input id="register-username" name="userName" className="lc-input" value={form.userName} placeholder='Please enter your username' onChange={handleChange} />
         </div>
         <div className="lc-field">
           <label htmlFor="register-password">Password</label>
-          <input id="register-password" name="password" type="password" className="lc-input" value={form.password} onChange={handleChange} />
+          <input id="register-password" name="password" type="password" className="lc-input" value={form.password} placeholder='Please enter your password' onChange={handleChange} />
         </div>
         <div className="lc-actions">
           <button type="submit" className="btn primary" disabled={isRegisterDisabled}>

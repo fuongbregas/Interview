@@ -3,12 +3,12 @@ import { apiClient } from '../../../api/client';
 import { extractTodoList, toDisplayOrder } from '../DashboardComponent/DashboardHelpers';
 import './DeleteConfirmPopup.css';
 
-const DeleteConfirmPopup = ({ todoId, userId, setTodo, onCancel, onDeleted }) => {
+const DeleteConfirmPopup = ({ todoId, token, setTodo, onCancel, onDeleted }) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
   const handleConfirm = async () => {
-    if (!todoId || !userId) return;
+    if (!todoId || !token) return;
 
     try {
       setLoading(true);
@@ -17,7 +17,7 @@ const DeleteConfirmPopup = ({ todoId, userId, setTodo, onCancel, onDeleted }) =>
       const res = await apiClient.delete('/todo/deleteTodo', {
         data: {
           todoId: Number(todoId),
-          userId: Number(userId),
+          token: token,
         },
       });
 

@@ -43,8 +43,9 @@ class UserServiceImplTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(existing));
         when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tokenService.validate("token")).thenReturn(Optional.of(1L));
 
-        UserEntity result = userService.updateUser(userId, userName, rawPassword);
+        UserEntity result = userService.updateUser("token", userName, rawPassword);
 
         ArgumentCaptor<UserEntity> captor = ArgumentCaptor.forClass(UserEntity.class);
         verify(userRepository).save(captor.capture());
@@ -61,7 +62,7 @@ class UserServiceImplTest {
     @Test
     void testUpdateUserWhenInputIsBlank() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> userService.updateUser(1L, "", ""));
+                () -> userService.updateUser("token", "", ""));
 
         assertEquals("Username and password must be provided", ex.getMessage());
         verify(userRepository, never()).findById(any());
@@ -70,10 +71,11 @@ class UserServiceImplTest {
 
     @Test
     void testUpdateUserWhenUserNotFound() {
+        when(tokenService.validate("token")).thenReturn(Optional.of(99L));
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> userService.updateUser(99L, "alice", "secret"));
+                () -> userService.updateUser("token", "alice", "secret"));
 
         assertEquals("Failed to update profile", ex.getMessage());
         verify(userRepository, never()).save(any());
@@ -186,29 +188,30 @@ class UserServiceImplTest {
 
         LoginResponse result = userService.loginUser("alice", "secret");
 
-        assertEquals(1L, result.getUserId());
         assertEquals("token-123", result.getToken());
         verify(tokenService).createTokenFor(1L);
     }
 
     @Test
-    void testGetUsernameFromUserIdSuccess() {
+    void testGetUsernameFromTokenSuccess() {
         UserEntity user = new UserEntity();
         user.setId(1L);
         user.setUserName("alice");
+        when(tokenService.validate("token")).thenReturn(Optional.of(1L));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        String result = userService.getUsernameFromUserId(1L);
+        String result = userService.getUsernameFromToken("token");
 
         assertEquals("alice", result);
     }
 
     @Test
-    void testGetUsernameFromUserIdWhenNotFound() {
+    void testGetUsernameFromTokenWhenNotFound() {
+        when(tokenService.validate("token")).thenReturn(Optional.of(999L));
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> userService.getUsernameFromUserId(999L));
+                () -> userService.getUsernameFromToken("token"));
 
         assertEquals("User not found", ex.getMessage());
     }

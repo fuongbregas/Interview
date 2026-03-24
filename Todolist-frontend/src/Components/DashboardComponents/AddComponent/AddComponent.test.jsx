@@ -27,7 +27,7 @@ jest.mock('../PopupComponent/DeleteConfirmPopup', () => {
 
 import { apiClient } from '../../../api/client';
 
-const defaultAuth = { userId: 42, token: 'token' };
+const defaultAuth = { token: 'token' };
 
 function renderAddComponent(props = {}) {
   const onClose = jest.fn();
@@ -90,7 +90,7 @@ describe('AddComponent', () => {
         todoName: 'New todo',
         todoDesc: 'desc here',
         dueDate: '2026-03-25',
-        ownerId: 42,
+        token: 'token',
         taskOrder: 5,
       });
     });
@@ -144,7 +144,7 @@ describe('AddComponent', () => {
         todoName: 'Updated title',
         todoDesc: 'Existing desc',
         dueDate: '2026-03-20',
-        ownerId: 42,
+        token: 'token',
         taskOrder: 4,
       });
     });

@@ -8,7 +8,7 @@ import './AddComponent.css';
 
 const AddComponent = ({ onClose, setTodo, taskOrder, todo }) => {
     const auth = useSelector(selectAuth);
-    const ownerId = auth?.userId;
+    const token = auth?.token;
     const [form, setForm] = React.useState({
         todoName: '',
         todoDescription: '',
@@ -56,7 +56,7 @@ const AddComponent = ({ onClose, setTodo, taskOrder, todo }) => {
                 todoName: form.todoName.trim(),
                 todoDesc: form.todoDescription.trim(),
                 dueDate: form.dueDate,
-                ownerId: Number(ownerId),
+                token: token,
                 taskOrder: Number(taskOrder),
             });
 
@@ -83,7 +83,7 @@ const AddComponent = ({ onClose, setTodo, taskOrder, todo }) => {
                 todoName: form.todoName.trim(),
                 todoDesc: form.todoDescription.trim(),
                 dueDate: form.dueDate,
-                ownerId: Number(ownerId),
+                token: token,
                 taskOrder: Number(todo.taskOrder),
             });
             const data = extractTodoList(res?.data);
@@ -162,7 +162,7 @@ const AddComponent = ({ onClose, setTodo, taskOrder, todo }) => {
             {showDeletePopup ? (
                 <DeleteConfirmPopup
                     todoId={todo?.id}
-                    userId={ownerId}
+                    token={token}
                     setTodo={setTodo}
                     onCancel={() => setShowDeletePopup(false)}
                     onDeleted={() => {

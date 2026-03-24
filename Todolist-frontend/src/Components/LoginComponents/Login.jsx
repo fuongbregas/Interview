@@ -31,7 +31,7 @@ const Login = () => {
     }
   }
 
-  const handleRegister = () => {
+  const handleOpenRegister = () => {
     dispatch(clearAuthError());
     setShowRegister(true);
   };
@@ -44,17 +44,17 @@ const Login = () => {
           <form onSubmit={handleLogin}>
             <div className="lc-field">
               <label htmlFor="login-username">Username</label>
-              <input id="login-username" name="userName" className="lc-input" value={credentials.userName} onChange={handleChange} />
+              <input id="login-username" name="userName" className="lc-input" value={credentials.userName} placeholder="Please enter your username" onChange={handleChange} />
             </div>
             <div className="lc-field">
               <label htmlFor="login-password">Password</label>
-              <input id="login-password" name="password" type="password" className="lc-input" value={credentials.password} onChange={handleChange} />
+              <input id="login-password" name="password" type="password" className="lc-input" value={credentials.password} placeholder="Please enter your password" onChange={handleChange} />
             </div>
             <div className="lc-actions">
               <button type="submit" className="btn primary" disabled={isLoginDisabled}>
                 {status === 'loading' ? 'Logging in…' : 'Login'}
               </button>
-              <button type="button" className="btn secondary" onClick={handleRegister}>Register</button>
+              <button type="button" className="btn secondary" onClick={handleOpenRegister}>Register</button>
             </div>
             {error ? <p className='error-message'>{error}</p> : null}
           </form>

@@ -77,10 +77,10 @@ describe('DashboardComponent', () => {
     expect(screen.queryByText(/dashboard/i)).not.toBeInTheDocument();
   });
 
-  test('does not fetch when auth has no userId (ownerId missing)', async () => {
+  test('does not fetch when auth has no token', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(1) });
 
-    renderWithStore({ token: 't' });
+    renderWithStore({});
     expect(apiClient.get).not.toHaveBeenCalled();
     expect(await screen.findByText(/no todos yet/i)).toBeInTheDocument();
   });
@@ -89,9 +89,9 @@ describe('DashboardComponent', () => {
     const todos = makeTodos(2);
     apiClient.get.mockResolvedValue({ data: todos });
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
-    expect(apiClient.get).toHaveBeenCalledWith('/todo/getTodoList', { params: { ownerId: 1 } });
+    expect(apiClient.get).toHaveBeenCalledWith('/todo/getTodoList', { params: { token: 't' } });
 
     expect(await screen.findByText('Task 1')).toBeInTheDocument();
     expect(screen.getByText('Task 2')).toBeInTheDocument();
@@ -99,14 +99,14 @@ describe('DashboardComponent', () => {
 
   test('accepts { todos: [] } response shape', async () => {
     apiClient.get.mockResolvedValue({ data: { todos: makeTodos(1) } });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(await screen.findByText('Task 1')).toBeInTheDocument();
   });
 
   test('treats unknown object response shape as empty list', async () => {
     apiClient.get.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(await screen.findByText(/no todos yet/i)).toBeInTheDocument();
   });
@@ -115,7 +115,7 @@ describe('DashboardComponent', () => {
     const d = defer();
     apiClient.get.mockReturnValueOnce(d.promise);
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(screen.getByText(/loading todos/i)).toBeInTheDocument();
     d.resolve({ data: [] });
@@ -125,7 +125,7 @@ describe('DashboardComponent', () => {
 
   test('shows error when todo fetch fails', async () => {
     apiClient.get.mockRejectedValue({ response: { data: { message: 'Boom' } } });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(await screen.findByText('Boom')).toBeInTheDocument();
     expect(screen.queryByText(/no todos yet/i)).not.toBeInTheDocument();
@@ -133,13 +133,13 @@ describe('DashboardComponent', () => {
 
   test('uses error.message when todo fetch fails without response', async () => {
     apiClient.get.mockRejectedValue(new Error('Network down'));
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     expect(await screen.findByText('Network down')).toBeInTheDocument();
   });
 
   test('uses default message when todo fetch fails with no details', async () => {
     apiClient.get.mockRejectedValue({});
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     expect(await screen.findByText(/failed to load todo list/i)).toBeInTheDocument();
   });
 
@@ -148,7 +148,7 @@ describe('DashboardComponent', () => {
     const d = defer();
     apiClient.get.mockReturnValueOnce(d.promise);
 
-    const { unmount } = renderWithStore({ userId: 1, token: 't' });
+    const { unmount } = renderWithStore({ token: 't' });
     unmount();
 
     d.resolve({ data: makeTodos(1) });
@@ -163,7 +163,7 @@ describe('DashboardComponent', () => {
     const d = defer();
     apiClient.get.mockReturnValueOnce(d.promise);
 
-    const { unmount } = renderWithStore({ userId: 1, token: 't' });
+    const { unmount } = renderWithStore({ token: 't' });
     unmount();
 
     d.reject({ response: { data: { message: 'Nope' } } });
@@ -175,14 +175,14 @@ describe('DashboardComponent', () => {
 
   test('shows empty message when list is empty', async () => {
     apiClient.get.mockResolvedValue({ data: [] });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(await screen.findByText(/no todos yet/i)).toBeInTheDocument();
   });
 
   test('paginates when more than 5 todos', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(8) });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     expect(await screen.findByText('Task 1')).toBeInTheDocument();
     // page 1 should not show task 8 (page size is 7)
@@ -198,7 +198,7 @@ describe('DashboardComponent', () => {
   test('drop on item without starting drag does not commit a move', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(2) });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
 
     await screen.findByText('Task 1');
 
@@ -210,7 +210,7 @@ describe('DashboardComponent', () => {
 
   test('drag start catches dataTransfer errors and drag end clears dragging state', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(1) });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('Task 1');
 
     const handle = screen.getAllByLabelText(/drag to reorder/i)[0];
@@ -228,7 +228,7 @@ describe('DashboardComponent', () => {
 
   test('drag over item without active drag does not preventDefault', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(1) });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('Task 1');
 
     const item = document.querySelectorAll('.dash-item')[0];
@@ -246,7 +246,7 @@ describe('DashboardComponent', () => {
 
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -262,7 +262,7 @@ describe('DashboardComponent', () => {
     // After dragging B to top display order: [B, A, C]
     // Backend payload keeps top as biggest taskOrder: [2,1,0]
     expect(apiClient.post).toHaveBeenCalledWith('/todo/moveTodolist', {
-      ownerId: 1,
+      token: 't',
       todolistEntityList: expect.arrayContaining([
         expect.objectContaining({ id: 2, taskOrder: 2 }),
         expect.objectContaining({ id: 1, taskOrder: 1 }),
@@ -274,7 +274,7 @@ describe('DashboardComponent', () => {
   test('dragOver on same index does not reorder (fromIndex === targetIndex)', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(3) });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('Task 1');
 
     const handle1 = screen.getAllByLabelText(/drag to reorder/i)[0];
@@ -299,14 +299,14 @@ describe('DashboardComponent', () => {
       .mockResolvedValueOnce({ data: owner2Todos });
     apiClient.post.mockResolvedValue({ data: {} });
 
-    const { store } = renderWithStore({ userId: 1, token: 't' });
+    const { store } = renderWithStore({ token: 't' });
     await screen.findByText('Task 1');
 
     const handle1 = screen.getAllByLabelText(/drag to reorder/i)[0];
     fireEvent.dragStart(handle1, { dataTransfer: { effectAllowed: 'move', setData: jest.fn() } });
 
     act(() => {
-      store.dispatch(setAuth({ userId: 2, token: 't' }));
+      store.dispatch(setAuth({ token: 't2' }));
     });
     await screen.findByText('X');
 
@@ -325,7 +325,7 @@ describe('DashboardComponent', () => {
 
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleA = screen.getAllByLabelText(/drag to reorder/i)[0];
@@ -341,7 +341,7 @@ describe('DashboardComponent', () => {
   test('drop on item without active drag id returns early', async () => {
     apiClient.get.mockResolvedValue({ data: makeTodos(1) });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('Task 1');
 
     const item = document.querySelectorAll('.dash-item')[0];
@@ -365,7 +365,7 @@ describe('DashboardComponent', () => {
       .mockResolvedValueOnce({ data: owner2Todos });
     apiClient.post.mockResolvedValue({ data: {} });
 
-    const { store } = renderWithStore({ userId: 1, token: 't' });
+    const { store } = renderWithStore({ token: 't' });
     await screen.findByText('A1');
 
     const handleB1 = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -374,7 +374,7 @@ describe('DashboardComponent', () => {
     });
 
     act(() => {
-      store.dispatch(setAuth({ userId: 2, token: 't' }));
+      store.dispatch(setAuth({ token: 't2' }));
     });
     expect(await screen.findByText('A2')).toBeInTheDocument();
 
@@ -393,7 +393,7 @@ describe('DashboardComponent', () => {
 
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleA = screen.getAllByLabelText(/drag to reorder/i)[0];
@@ -425,7 +425,7 @@ describe('DashboardComponent', () => {
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockRejectedValue({ response: { data: { message: 'Failed move' } } });
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -451,7 +451,7 @@ describe('DashboardComponent', () => {
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockRejectedValue(new Error('Move broke'));
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -471,7 +471,7 @@ describe('DashboardComponent', () => {
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockRejectedValue({});
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -503,7 +503,7 @@ describe('DashboardComponent', () => {
       apiClient.get.mockResolvedValue({ data: todos });
       apiClient.post.mockResolvedValue({ data: {} });
 
-      renderWithStore({ userId: 1, token: 't' });
+      renderWithStore({ token: 't' });
       await screen.findByText('A');
 
       const item0 = document.querySelectorAll('.dash-item')[0];
@@ -535,7 +535,7 @@ describe('DashboardComponent', () => {
       apiClient.get.mockResolvedValue({ data: todos });
       apiClient.post.mockRejectedValue({ response: { data: { message: 'No revert' } } });
 
-      renderWithStore({ userId: 1, token: 't' });
+      renderWithStore({ token: 't' });
       await screen.findByText('A');
 
       const item0 = document.querySelectorAll('.dash-item')[0];
@@ -556,7 +556,7 @@ describe('DashboardComponent', () => {
 
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('A');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[1];
@@ -568,7 +568,7 @@ describe('DashboardComponent', () => {
     fireEvent.drop(item0, { preventDefault: jest.fn() });
     await waitFor(() => expect(apiClient.post).toHaveBeenCalled());
     expect(apiClient.post).toHaveBeenLastCalledWith('/todo/moveTodolist', {
-      ownerId: 1,
+      token: 't',
       todolistEntityList: expect.arrayContaining([
         expect.objectContaining({ id: 2, taskOrder: 2 }),
       ]),
@@ -584,7 +584,7 @@ describe('DashboardComponent', () => {
 
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     await screen.findByText('B');
 
     const handleB = screen.getAllByLabelText(/drag to reorder/i)[0];
@@ -597,14 +597,14 @@ describe('DashboardComponent', () => {
 
     await waitFor(() => expect(apiClient.post).toHaveBeenCalled());
     expect(apiClient.post).toHaveBeenLastCalledWith('/todo/moveTodolist', {
-      ownerId: 1,
+      token: 't',
       todolistEntityList: expect.arrayContaining([
         expect.objectContaining({ id: 1, taskOrder: 1 }),
       ]),
     });
   });
 
-  test('drag drop calls moveTodolist with ownerId + todolistEntityList payload', async () => {
+  test('drag drop calls moveTodolist with token + todolistEntityList payload', async () => {
     const todos = [
       { id: 7, taskName: 'A', taskDesc: '', taskOrder: 'V', taskDate: '2026-03-20', ownerId: 1 },
       { id: 8, taskName: 'B', taskDesc: '', taskOrder: 'VV', taskDate: '2026-03-20', ownerId: 1 },
@@ -614,7 +614,7 @@ describe('DashboardComponent', () => {
     apiClient.get.mockResolvedValue({ data: todos });
     apiClient.post.mockResolvedValue({ data: {} });
 
-    renderWithStore({ userId: 1, token: 't' });
+    renderWithStore({ token: 't' });
     expect(await screen.findByText('A')).toBeInTheDocument();
 
     // Start dragging item B via its drag handle
@@ -638,7 +638,7 @@ describe('DashboardComponent', () => {
     // After dropping B to top, display order is [B, A, C]
     // Backend payload keeps top as biggest taskOrder: B=2, A=1, C=0
     expect(apiClient.post).toHaveBeenCalledWith('/todo/moveTodolist', {
-      ownerId: 1,
+      token: 't',
       todolistEntityList: expect.arrayContaining([
         expect.objectContaining({ id: 8, taskOrder: 2 }),
         expect.objectContaining({ id: 7, taskOrder: 1 }),
@@ -660,7 +660,7 @@ describe('DashboardComponent', () => {
 
     try {
       apiClient.get.mockResolvedValue({ data: [] });
-      renderWithStore({ userId: 1, token: 't' });
+      renderWithStore({ token: 't' });
 
       expect(await screen.findByText(/no todos yet/i)).toBeInTheDocument();
     } finally {

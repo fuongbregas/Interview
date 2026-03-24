@@ -36,10 +36,10 @@ class TodolistControllerTest {
         todo.setOwnerId(1L);
 
         ReorderTodolistRequest request = new ReorderTodolistRequest();
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTodolistEntityList(List.of(todo));
 
-        when(todolistService.moveTodolist(1L, request.getTodolistEntityList())).thenReturn(List.of(todo));
+        when(todolistService.moveTodolist("token", request.getTodolistEntityList())).thenReturn(List.of(todo));
 
         ResponseEntity<?> response = todolistController.reorderTodo(request);
 
@@ -50,10 +50,10 @@ class TodolistControllerTest {
     @Test
     void reorderTodoErrorWhenException() {
         ReorderTodolistRequest request = new ReorderTodolistRequest();
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTodolistEntityList(List.of());
 
-        when(todolistService.moveTodolist(1L, request.getTodolistEntityList()))
+        when(todolistService.moveTodolist("token", request.getTodolistEntityList()))
                 .thenThrow(new RuntimeException("failed"));
 
         ResponseEntity<?> response = todolistController.reorderTodo(request);
@@ -68,13 +68,13 @@ class TodolistControllerTest {
         request.setTodoName("Workout");
         request.setTodoDesc("from home");
         request.setDueDate(LocalDate.of(2026, 3, 20));
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTaskOrder(100L);
 
         TodolistEntity todo = new TodolistEntity();
         todo.setId(2L);
 
-        when(todolistService.addTodo("Workout", "from home", request.getDueDate(), 1L, 100L))
+        when(todolistService.addTodo("Workout", "from home", request.getDueDate(), "token", 100L))
                 .thenReturn(List.of(todo));
 
         ResponseEntity<?> response = todolistController.addTodo(request);
@@ -89,10 +89,10 @@ class TodolistControllerTest {
         request.setTodoName("Workout");
         request.setTodoDesc("from home");
         request.setDueDate(LocalDate.of(2026, 3, 20));
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTaskOrder(100L);
 
-        when(todolistService.addTodo("Workout", "from home", request.getDueDate(), 1L, 100L))
+        when(todolistService.addTodo("Workout", "from home", request.getDueDate(), "token", 100L))
                 .thenThrow(new RuntimeException("failed"));
 
         ResponseEntity<?> response = todolistController.addTodo(request);
@@ -108,13 +108,13 @@ class TodolistControllerTest {
         request.setTodoName("Updated");
         request.setTodoDesc("Updated desc");
         request.setDueDate(LocalDate.of(2026, 3, 21));
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTaskOrder(200L);
 
         TodolistEntity todo = new TodolistEntity();
         todo.setId(3L);
 
-        when(todolistService.updateTodo(3L, "Updated", "Updated desc", request.getDueDate(), 1L, 200L))
+        when(todolistService.updateTodo(3L, "Updated", "Updated desc", request.getDueDate(), "token", 200L))
                 .thenReturn(List.of(todo));
 
         ResponseEntity<?> response = todolistController.updateTodo(request);
@@ -130,10 +130,10 @@ class TodolistControllerTest {
         request.setTodoName("Updated");
         request.setTodoDesc("Updated desc");
         request.setDueDate(LocalDate.of(2026, 3, 21));
-        request.setOwnerId(1L);
+        request.setToken("token");
         request.setTaskOrder(200L);
 
-        when(todolistService.updateTodo(3L, "Updated", "Updated desc", request.getDueDate(), 1L, 200L))
+        when(todolistService.updateTodo(3L, "Updated", "Updated desc", request.getDueDate(), "token", 200L))
                 .thenThrow(new RuntimeException("failed"));
 
         ResponseEntity<?> response = todolistController.updateTodo(request);
@@ -147,9 +147,9 @@ class TodolistControllerTest {
         TodolistEntity todo = new TodolistEntity();
         todo.setId(4L);
 
-        when(todolistService.getTodoList(1L)).thenReturn(List.of(todo));
+        when(todolistService.getTodoList("token")).thenReturn(List.of(todo));
 
-        ResponseEntity<List<TodolistEntity>> response = todolistController.getTodoByOwner(1L);
+        ResponseEntity<List<TodolistEntity>> response = todolistController.getTodoByOwner("token");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(todo), response.getBody());
@@ -159,12 +159,12 @@ class TodolistControllerTest {
     void deleteTodoOk() {
         DeleteTodoRequest request = new DeleteTodoRequest();
         request.setTodoId(5L);
-        request.setUserId(1L);
+        request.setToken("token");
 
         TodolistEntity todo = new TodolistEntity();
         todo.setId(6L);
 
-        when(todolistService.deleteTodo(5L, 1L)).thenReturn(List.of(todo));
+        when(todolistService.deleteTodo(5L, "token")).thenReturn(List.of(todo));
 
         ResponseEntity<?> response = todolistController.deleteTodo(request);
 
@@ -176,9 +176,9 @@ class TodolistControllerTest {
     void deleteTodoErrorWhenException() {
         DeleteTodoRequest request = new DeleteTodoRequest();
         request.setTodoId(5L);
-        request.setUserId(1L);
+        request.setToken("token");
 
-        when(todolistService.deleteTodo(5L, 1L)).thenThrow(new RuntimeException("failed"));
+        when(todolistService.deleteTodo(5L, "token")).thenThrow(new RuntimeException("failed"));
 
         ResponseEntity<?> response = todolistController.deleteTodo(request);
 

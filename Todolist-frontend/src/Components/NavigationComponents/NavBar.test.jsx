@@ -39,7 +39,7 @@ describe('NavBar', () => {
   });
 
   test('Navigates to /profile when Profile button clicked', async () => {
-    useSelector.mockReturnValue({ userId: 1 });
+    useSelector.mockReturnValue({ token: 't' });
 
     render(<NavBar />);
     await userEvent.click(screen.getByRole('button', { name: /profile/i }));
@@ -48,7 +48,7 @@ describe('NavBar', () => {
   });
 
   test('Logout + navigates to /login when Logout button clicked', async () => {
-    useSelector.mockReturnValue({ userId: 1 });
+    useSelector.mockReturnValue({ token: 't' });
     logout.mockReturnValue({ type: 'auth/logout' });
 
     render(<NavBar />);

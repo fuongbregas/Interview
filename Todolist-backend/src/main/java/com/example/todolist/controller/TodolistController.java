@@ -22,7 +22,7 @@ public class TodolistController {
     @PostMapping("/moveTodolist")
     public ResponseEntity<?> reorderTodo(@RequestBody ReorderTodolistRequest request) {
         try {
-            return ResponseEntity.ok(todolistService.moveTodolist(request.getOwnerId(), request.getTodolistEntityList()));
+            return ResponseEntity.ok(todolistService.moveTodolist(request.getToken(), request.getTodolistEntityList()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to move todo");
         }
@@ -32,7 +32,7 @@ public class TodolistController {
     @PostMapping("/addTodolist")
     public ResponseEntity<?> addTodo(@RequestBody AddTodolistRequest request) {
         try {
-            return ResponseEntity.ok(todolistService.addTodo(request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getOwnerId(), request.getTaskOrder()));
+            return ResponseEntity.ok(todolistService.addTodo(request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getToken(), request.getTaskOrder()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to add todo");
         }
@@ -42,7 +42,7 @@ public class TodolistController {
     @PutMapping("/updateTodo")
     public ResponseEntity<?> updateTodo(@RequestBody UpdateTodoRequest request) {
         try {
-            return ResponseEntity.ok(todolistService.updateTodo(request.getTodoId(), request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getOwnerId(), request.getTaskOrder()));
+            return ResponseEntity.ok(todolistService.updateTodo(request.getTodoId(), request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getToken(), request.getTaskOrder()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to update todo");
         }
@@ -50,15 +50,15 @@ public class TodolistController {
 
     @CrossOrigin
     @GetMapping("/getTodoList")
-    public ResponseEntity<List<TodolistEntity>> getTodoByOwner(@RequestParam Long ownerId) {
-        return ResponseEntity.ok(todolistService.getTodoList(ownerId));
+    public ResponseEntity<List<TodolistEntity>> getTodoByOwner(@RequestParam String token) {
+        return ResponseEntity.ok(todolistService.getTodoList(token));
     }
 
     @CrossOrigin
     @DeleteMapping("/deleteTodo")
     public ResponseEntity<?> deleteTodo(@RequestBody DeleteTodoRequest request) {
         try {
-            return ResponseEntity.ok(todolistService.deleteTodo(request.getTodoId(), request.getUserId()));
+            return ResponseEntity.ok(todolistService.deleteTodo(request.getTodoId(), request.getToken()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to delete todo");
         }

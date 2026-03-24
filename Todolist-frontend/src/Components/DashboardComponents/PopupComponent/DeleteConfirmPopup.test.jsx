@@ -26,7 +26,7 @@ function renderPopup(props = {}) {
   render(
     <DeleteConfirmPopup
       todoId={9}
-      userId={7}
+      token="t"
       setTodo={setTodo}
       onCancel={onCancel}
       onDeleted={onDeleted}
@@ -67,8 +67,8 @@ describe('DeleteConfirmPopup', () => {
     expect(apiClient.delete).not.toHaveBeenCalled();
   });
 
-  test('Delete API fails when userId is missing', async () => {
-    renderPopup({ userId: null });
+  test('Delete API fails when token is missing', async () => {
+    renderPopup({ token: null });
 
     fireEvent.click(screen.getByRole('button', { name: /confirm/i }));
 
@@ -84,7 +84,7 @@ describe('DeleteConfirmPopup', () => {
     extractTodoList.mockReturnValueOnce(extracted);
     toDisplayOrder.mockReturnValueOnce(ordered);
 
-    const { setTodo, onDeleted } = renderPopup({ todoId: '9', userId: '7' });
+    const { setTodo, onDeleted } = renderPopup({ todoId: '9', token: 'tk' });
 
     fireEvent.click(screen.getByRole('button', { name: /confirm/i }));
 
@@ -92,7 +92,7 @@ describe('DeleteConfirmPopup', () => {
       expect(apiClient.delete).toHaveBeenCalledWith('/todo/deleteTodo', {
         data: {
           todoId: 9,
-          userId: 7,
+          token: 'tk',
         },
       });
     });

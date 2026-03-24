@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class DeleteTodoRequest {
     private Long todoId;
-    private Long userId;
+    private String token;
 }

@@ -16,7 +16,7 @@ import './DashboardComponent.css';
 
 const DashboardComponent = () => {
     const auth = useSelector(selectAuth);
-    const ownerId = auth?.userId;
+    const token = auth?.token;
     const [todos, setTodos] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [error, setError] = React.useState('');
@@ -49,14 +49,14 @@ const DashboardComponent = () => {
     }, -1) + 1;
 
     const commitMove = async (nextTodos, previousTodos) => {
-        if (!ownerId) return;
+        if (!token) return;
 
         const backendTodoList = toBackendTodolistEntityList(nextTodos);
 
         try {
             setMoveError('');
             const res = await apiClient.post('/todo/moveTodolist', {
-                ownerId: Number(ownerId),
+                token: token,
                 todolistEntityList: backendTodoList,
             });
 
@@ -125,7 +125,7 @@ const DashboardComponent = () => {
     useEffect(() => {
         let cancelled = false;
 
-        if (!ownerId) {
+        if (!token) {
             setTodos([]);
             setError('');
             setLoading(false);
@@ -140,7 +140,7 @@ const DashboardComponent = () => {
 
             try {
                 const res = await apiClient.get('/todo/getTodoList', {
-                    params: { ownerId },
+                    params: { token },
                 });
 
                 if (cancelled) return;
@@ -159,11 +159,11 @@ const DashboardComponent = () => {
         return () => {
             cancelled = true;
         };
-    }, [ownerId]);
+    }, [token]);
 
     useEffect(() => {
         setPage(1);
-    }, [ownerId]);
+    }, [token]);
 
     useEffect(() => {
         if (page > totalPages) setPage(totalPages);
@@ -247,8 +247,7 @@ const DashboardComponent = () => {
                     <PaginationComponent
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        onPrev={() => setPage(p => Math.max(1, p - 1))}
-                        onNext={() => setPage(p => Math.min(totalPages, p + 1))}
+                        setPage={setPage}
                     />
                 </div>
             ) : null}
