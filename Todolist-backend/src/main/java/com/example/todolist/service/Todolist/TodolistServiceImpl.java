@@ -4,11 +4,13 @@ import com.example.todolist.entity.TodolistEntity;
 import com.example.todolist.repository.TodolistRepository;
 import com.example.todolist.security.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service("TodolistService")
 public class TodolistServiceImpl implements TodolistService {
@@ -19,19 +21,17 @@ public class TodolistServiceImpl implements TodolistService {
 
     @Override
     public List<TodolistEntity> getTodoList(String token) {
-        Long ownerId = tokenService.validate(token).orElse(null);
+        Long ownerId = requireOwnerId(token);
         return todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
     }
 
     @Override
     public List<TodolistEntity> updateTodo(Long todoId, String todoName, String todoDesc, LocalDate dueDate, String token, Long taskOrder) {
-        Long ownerId = tokenService.validate(token).orElse(null);
-        TodolistEntity updatedEntity = new TodolistEntity();
-        updatedEntity.setId(todoId);
+        Long ownerId = requireOwnerId(token);
+        TodolistEntity updatedEntity = verifyOwner(todoId, ownerId);
         updatedEntity.setTaskName(todoName);
         updatedEntity.setTaskDesc(todoDesc);
         updatedEntity.setTaskDate(dueDate);
-        updatedEntity.setOwnerId(ownerId);
         updatedEntity.setTaskOrder(taskOrder);
         todolistRepository.save(updatedEntity);
         return todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
@@ -39,21 +39,22 @@ public class TodolistServiceImpl implements TodolistService {
 
     @Override
     public List<TodolistEntity> deleteTodo(Long todoId, String token) {
-        todolistRepository.deleteById(todoId);
-        Long ownerId = tokenService.validate(token).orElse(null);
+        Long ownerId = requireOwnerId(token);
+        TodolistEntity entity = verifyOwner(todoId, ownerId);
+        todolistRepository.delete(entity);
         return todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
     }
 
     @Override
     public List<TodolistEntity> moveTodolist(String ownerToken, List<TodolistEntity> todolistEntityList) {
-        Long ownerId = tokenService.validate(ownerToken).orElse(null);
+        Long ownerId = requireOwnerId(ownerToken);
         todolistRepository.saveAll(todolistEntityList);
         return todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
     }
 
     @Override
     public List<TodolistEntity> addTodo(String todoName, String todoDesc, LocalDate dueDate, String token, Long taskOrder) {
-        Long ownerId = tokenService.validate(token).orElse(null);
+        Long ownerId = requireOwnerId(token);
         TodolistEntity newTodo = new TodolistEntity();
         newTodo.setOwnerId(ownerId);
         newTodo.setTaskName(todoName);
@@ -62,5 +63,22 @@ public class TodolistServiceImpl implements TodolistService {
         newTodo.setTaskOrder(taskOrder);
         todolistRepository.save(newTodo);
         return todolistRepository.findAllByOwnerIdOrderByTaskOrderDesc(ownerId);
+    }
+
+    private Long requireOwnerId(String token) {
+        if (token == null || token.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token");
+        }
+        return tokenService.validate(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+    }
+
+    private TodolistEntity verifyOwner(Long todoId, Long ownerId) {
+        TodolistEntity entity = todolistRepository.findById(todoId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found"));
+        if (!Objects.equals(entity.getOwnerId(), ownerId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Todo does not belong to this user");
+        }
+        return entity;
     }
 }

@@ -130,8 +130,7 @@ class UserControllerTest {
         request.setUserName("alice");
         request.setPassword("secret");
 
-        com.example.todolist.service.User.LoginResponse serviceResponse =
-                new com.example.todolist.service.User.LoginResponse("token-123");
+        LoginResponse serviceResponse = new LoginResponse("token-123");
         when(userService.loginUser("alice", "secret")).thenReturn(serviceResponse);
 
         ResponseEntity<?> response = userController.login(request);

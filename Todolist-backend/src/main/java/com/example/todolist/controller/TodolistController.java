@@ -9,6 +9,7 @@ import com.example.todolist.service.Todolist.TodolistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class TodolistController {
     public ResponseEntity<?> reorderTodo(@RequestBody ReorderTodolistRequest request) {
         try {
             return ResponseEntity.ok(todolistService.moveTodolist(request.getToken(), request.getTodolistEntityList()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to move todo");
         }
@@ -33,6 +36,8 @@ public class TodolistController {
     public ResponseEntity<?> addTodo(@RequestBody AddTodolistRequest request) {
         try {
             return ResponseEntity.ok(todolistService.addTodo(request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getToken(), request.getTaskOrder()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to add todo");
         }
@@ -43,6 +48,8 @@ public class TodolistController {
     public ResponseEntity<?> updateTodo(@RequestBody UpdateTodoRequest request) {
         try {
             return ResponseEntity.ok(todolistService.updateTodo(request.getTodoId(), request.getTodoName(), request.getTodoDesc(), request.getDueDate(), request.getToken(), request.getTaskOrder()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to update todo");
         }
@@ -50,8 +57,12 @@ public class TodolistController {
 
     @CrossOrigin
     @GetMapping("/getTodoList")
-    public ResponseEntity<List<TodolistEntity>> getTodoByOwner(@RequestParam String token) {
-        return ResponseEntity.ok(todolistService.getTodoList(token));
+    public ResponseEntity<?> getTodoByOwner(@RequestParam String token) {
+        try {
+            return ResponseEntity.ok(todolistService.getTodoList(token));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
     }
 
     @CrossOrigin
@@ -59,6 +70,8 @@ public class TodolistController {
     public ResponseEntity<?> deleteTodo(@RequestBody DeleteTodoRequest request) {
         try {
             return ResponseEntity.ok(todolistService.deleteTodo(request.getTodoId(), request.getToken()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Failed to delete todo");
         }

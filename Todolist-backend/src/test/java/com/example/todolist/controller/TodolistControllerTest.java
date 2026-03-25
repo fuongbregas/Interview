@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -63,6 +64,21 @@ class TodolistControllerTest {
     }
 
     @Test
+    void reorderTodoUnauthorizedWhenResponseStatusException() {
+        ReorderTodolistRequest request = new ReorderTodolistRequest();
+        request.setToken("token");
+        request.setTodolistEntityList(List.of());
+
+        when(todolistService.moveTodolist("token", request.getTodolistEntityList()))
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token"));
+
+        ResponseEntity<?> response = todolistController.reorderTodo(request);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Missing token", response.getBody());
+    }
+
+    @Test
     void addTodoOk() {
         AddTodolistRequest request = new AddTodolistRequest();
         request.setTodoName("Workout");
@@ -99,6 +115,24 @@ class TodolistControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Failed to add todo", response.getBody());
+    }
+
+    @Test
+    void addTodoUnauthorizedWhenResponseStatusException() {
+        AddTodolistRequest request = new AddTodolistRequest();
+        request.setTodoName("Workout");
+        request.setTodoDesc("from home");
+        request.setDueDate(LocalDate.of(2026, 3, 20));
+        request.setToken("token");
+        request.setTaskOrder(100L);
+
+        when(todolistService.addTodo("Workout", "from home", request.getDueDate(), "token", 100L))
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token"));
+
+        ResponseEntity<?> response = todolistController.addTodo(request);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Missing token", response.getBody());
     }
 
     @Test
@@ -143,16 +177,46 @@ class TodolistControllerTest {
     }
 
     @Test
+    void updateTodoUnauthorizedWhenResponseStatusException() {
+        UpdateTodoRequest request = new UpdateTodoRequest();
+        request.setTodoId(3L);
+        request.setTodoName("Updated");
+        request.setTodoDesc("Updated desc");
+        request.setDueDate(LocalDate.of(2026, 3, 21));
+        request.setToken("token");
+        request.setTaskOrder(200L);
+
+        when(todolistService.updateTodo(3L, "Updated", "Updated desc", request.getDueDate(), "token", 200L))
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token"));
+
+        ResponseEntity<?> response = todolistController.updateTodo(request);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Missing token", response.getBody());
+    }
+
+    @Test
     void getTodoByOwnerOk() {
         TodolistEntity todo = new TodolistEntity();
         todo.setId(4L);
 
         when(todolistService.getTodoList("token")).thenReturn(List.of(todo));
 
-        ResponseEntity<List<TodolistEntity>> response = todolistController.getTodoByOwner("token");
+        ResponseEntity<?> response = todolistController.getTodoByOwner("token");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(List.of(todo), response.getBody());
+    }
+
+    @Test
+    void getTodoByOwnerUnauthorizedWhenInvalidToken() {
+        when(todolistService.getTodoList("token"))
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token"));
+
+        ResponseEntity<?> response = todolistController.getTodoByOwner("token");
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid token", response.getBody());
     }
 
     @Test
@@ -184,5 +248,20 @@ class TodolistControllerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Failed to delete todo", response.getBody());
+    }
+
+    @Test
+    void deleteTodoUnauthorizedWhenResponseStatusException() {
+        DeleteTodoRequest request = new DeleteTodoRequest();
+        request.setTodoId(5L);
+        request.setToken("token");
+
+        when(todolistService.deleteTodo(5L, "token"))
+                .thenThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing token"));
+
+        ResponseEntity<?> response = todolistController.deleteTodo(request);
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Missing token", response.getBody());
     }
 }

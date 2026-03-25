@@ -1,5 +1,6 @@
 package com.example.todolist.service.User;
 
+import com.example.todolist.controller.dto.UserDto.LoginResponse;
 import com.example.todolist.entity.UserEntity;
 import com.example.todolist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
